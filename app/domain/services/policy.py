@@ -1,5 +1,5 @@
 from decimal import Decimal
-from app.application.dto.policy_response import PolicyLimitResponse
+
 class ServicePolicy:
     """ Service responsible for calculating the insurance policy limit. """
 

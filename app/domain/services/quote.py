@@ -1,11 +1,10 @@
 from fastapi import Depends
 from decimal import Decimal
-from pydantic import BaseModel
-from app.domain.value_objects.factor_risk import FactorRisk
-from app.domain.entities.quotation import Quotation
 from app.domain.services.rate import ServiceRate
 from app.domain.services.premium import ServicePremium
 from app.domain.services.policy import ServicePolicy
+from app.application.dto.insurence import CarDetails
+from app.application.dto.quote_response import QuotationResponse
 
 class ServiceQuote:
 
@@ -14,13 +13,13 @@ class ServiceQuote:
         self.service_premium = service_premium
         self.service_policy = service_policy
 
-    def generate(self, broker_fee: Decimal, car_age: int,  car_value: Decimal, deductible_percentage: Decimal, coverage_percentage: Decimal) -> Quotation:
+    def generate(self, broker_fee: Decimal, car: CarDetails, deductible_percentage: Decimal, coverage_percentage: Decimal) -> QuotationResponse:
         
-        applied_rate = self.service_rate.calculate(car_age, car_value)
+        applied_rate = self.service_rate.calculate(car.year, car.value)
 
-        final_premium = self.service_premium.calculate(applied_rate, broker_fee, car_value, deductible_percentage)
+        calculated_premium, deductible_value = self.service_premium.calculate(applied_rate, broker_fee, car.value, deductible_percentage)
 
-        final_policy_limit = self.service_policy.calculate_policy_limit(car_value, coverage_percentage, deductible_percentage)
+        final_policy_limit = self.service_policy.calculate_policy_limit(car.value, coverage_percentage, deductible_percentage)
 
-        return  Quotation(applied_rate=applied_rate, policy_limit=final_policy_limit, premium=final_premium)
+        return  QuotationResponse(car_details=car, applied_rate=applied_rate, deductible_value= deductible_value,  calculated_premium=calculated_premium, policy_limit=final_policy_limit,)
 

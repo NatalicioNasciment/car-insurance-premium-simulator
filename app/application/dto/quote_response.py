@@ -1,7 +1,9 @@
 from pydantic import BaseModel
-from decimal import Decimal
+from app.application.dto.insurence import CarDetails
 
-class QuoteResponse(BaseModel):
-    premium: Decimal
-    policy_limit: Decimal
-    applied_rate: Decimal
+class QuotationResponse(BaseModel):
+    car_details: CarDetails
+    applied_rate: float
+    calculated_premium : float
+    deductible_value: float
+    policy_limit: float
